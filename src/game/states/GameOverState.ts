@@ -5,7 +5,8 @@ import { GameEvent } from '../../core/types';
 export class GameOverState implements IGameState {
   enter(manager: GameManager): void {
     const coverage = manager.scoreManager.getCoverage();
-    manager.eventBus.emit(GameEvent.GAME_OVER, { coverage });
+    const maxCombo = manager.comboManager.getMaxCombo();
+    manager.eventBus.emit(GameEvent.GAME_OVER, { coverage, maxCombo });
   }
 
   update(_manager: GameManager, _delta: number): void {

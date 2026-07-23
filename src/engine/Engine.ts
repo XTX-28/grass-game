@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { GrassField } from './GrassField';
 import { ParticleSystem } from './ParticleSystem';
 import { TrailRenderer } from './TrailRenderer';
-import { GAME_CONFIG } from '../config/game.config';
+import { GAME_CONFIG, getGrassDensity } from '../config/game.config';
 
 export class Engine {
   private renderer: THREE.WebGLRenderer;
@@ -15,6 +15,9 @@ export class Engine {
   private container: HTMLElement;
   private animationId: number | null = null;
   private onFrameCallbacks: ((delta: number) => void)[] = [];
+  private shakeTimer = 0;
+  private shakeIntensity = 0;
+  private cameraBasePos = new THREE.Vector3(0, 20, 0);
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -55,12 +58,13 @@ export class Engine {
     directionalLight.position.set(5, 10, 5);
     this.scene.add(directionalLight);
 
-    // Ground plane
+    // Ground plane with procedural texture
     const groundGeo = new THREE.PlaneGeometry(
       GAME_CONFIG.fieldWidth + 2,
       GAME_CONFIG.fieldHeight + 2
     );
-    const groundMat = new THREE.MeshBasicMaterial({ color: 0x3a7a34 });
+    const groundTexture = this.createGroundTexture();
+    const groundMat = new THREE.MeshBasicMaterial({ map: groundTexture });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.01;
@@ -70,7 +74,7 @@ export class Engine {
     this.grassField = new GrassField(
       GAME_CONFIG.fieldWidth,
       GAME_CONFIG.fieldHeight,
-      GAME_CONFIG.grassDensity
+      getGrassDensity()
     );
     this.scene.add(this.grassField.getMesh());
 
@@ -107,6 +111,36 @@ export class Engine {
     this.camera.updateProjectionMatrix();
   };
 
+  private createGroundTexture(): THREE.CanvasTexture {
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d')!;
+
+    // Base color
+    ctx.fillStyle = '#3a7a34';
+    ctx.fillRect(0, 0, size, size);
+
+    // Add noise for natural look
+    for (let i = 0; i < 3000; i++) {
+      const x = Math.random() * size;
+      const y = Math.random() * size;
+      const brightness = Math.random() * 30 - 15;
+      const r = 58 + brightness;
+      const g = 122 + brightness;
+      const b = 52 + brightness;
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(x, y, 2, 2);
+    }
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(4, 6);
+    return texture;
+  }
+
   start(): void {
     this.clock.start();
     this.loop();
@@ -126,6 +160,20 @@ export class Engine {
     this.grassField.update(delta);
     this.particles.update(delta);
     this.trail.update(delta);
+
+    // Screen shake
+    if (this.shakeTimer > 0) {
+      this.shakeTimer -= delta;
+      const shakeX = (Math.random() - 0.5) * 2 * this.shakeIntensity;
+      const shakeZ = (Math.random() - 0.5) * 2 * this.shakeIntensity;
+      this.camera.position.set(
+        this.cameraBasePos.x + shakeX,
+        this.cameraBasePos.y,
+        this.cameraBasePos.z + shakeZ
+      );
+    } else {
+      this.camera.position.copy(this.cameraBasePos);
+    }
 
     for (const cb of this.onFrameCallbacks) {
       cb(delta);
@@ -167,6 +215,11 @@ export class Engine {
 
   resetGrass(): void {
     this.grassField.reset();
+  }
+
+  screenShake(intensity: number, duration: number): void {
+    this.shakeIntensity = intensity;
+    this.shakeTimer = duration;
   }
 
   dispose(): void {

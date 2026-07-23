@@ -12,6 +12,11 @@ export class StartScreen {
       <div class="start-title">割草大作战</div>
       <div class="start-subtitle">滑动屏幕，割尽所有草地</div>
       <button class="start-btn" id="start-btn">开始游戏</button>
+      <div class="start-targets">
+        <div class="start-target">⭐ 30% 覆盖率</div>
+        <div class="start-target">⭐⭐ 60% 覆盖率</div>
+        <div class="start-target">⭐⭐⭐ 90% 覆盖率</div>
+      </div>
       <div class="start-hint">在 60 秒内尽可能多地割草</div>
     `;
     container.appendChild(this.element);

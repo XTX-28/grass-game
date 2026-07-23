@@ -10,7 +10,7 @@ export class HUD {
 
   constructor(bus: EventBus, container: HTMLElement) {
     this.element = document.createElement('div');
-    this.element.className = 'hud';
+    this.element.className = 'hud hidden';
     this.element.innerHTML = `
       <div class="hud-item">
         <span class="hud-label">时间</span>
@@ -44,6 +44,7 @@ export class HUD {
     });
 
     bus.on(GameEvent.GAME_RESET, () => {
+      this.element.classList.add('hidden');
       this.timeValue.textContent = '60';
       this.coverageValue.textContent = '0%';
       this.progressBar.style.width = '0%';

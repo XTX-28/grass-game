@@ -3,9 +3,12 @@ import { GameEvent, GameStateType } from './core/types';
 import { Engine } from './engine/Engine';
 import { GameManager } from './game/GameManager';
 import { InputHandler } from './game/InputHandler';
+import { AudioManager } from './game/AudioManager';
 import { HUD } from './ui/HUD';
 import { GameOverPanel } from './ui/GameOverPanel';
 import { StartScreen } from './ui/StartScreen';
+import { PauseButton } from './ui/PauseButton';
+import { ComboDisplay } from './ui/ComboDisplay';
 import { GAME_CONFIG } from './config/game.config';
 
 // Global styles
@@ -31,10 +34,15 @@ class App {
     // Create InputHandler
     new InputHandler(this.bus, this.engine);
 
+    // Create AudioManager
+    new AudioManager(this.bus);
+
     // Create UI
     new HUD(this.bus, container);
     new GameOverPanel(this.bus, container);
     new StartScreen(this.bus, container);
+    new PauseButton(this.bus, container);
+    new ComboDisplay(this.bus, container);
 
     // Wire up game logic
     this.setupGameLogic();
@@ -57,6 +65,8 @@ class App {
 
       if (newCuts > 0) {
         particles.emit(coord.x, 0, coord.z, Math.min(newCuts, GAME_CONFIG.particleCount));
+        this.engine.screenShake(GAME_CONFIG.screenShakeIntensity, GAME_CONFIG.screenShakeDuration);
+        this.bus.emit(GameEvent.GAME_CUT, { cutCount: newCuts });
       }
 
       trail.addPoint(coord.x, 0, coord.z);

@@ -54,6 +54,20 @@
   50% { transform: scale(1.05); }
 }
 
+.start-targets {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.start-target {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+}
+
 .start-hint {
   margin-top: 32px;
   font-size: 13px;

@@ -142,14 +142,8 @@ export class GrassField implements IGrassField {
   }
 
   reset(): void {
-    for (let i = 0; i < this.count; i++) {
-      this.cutProgressArray[i] = 0;
-      this.isCut[i] = 0;
-    }
-    this.cutCount = 0;
-
-    const attr = this.mesh.geometry.getAttribute('aCutProgress') as THREE.InstancedBufferAttribute;
-    attr.needsUpdate = true;
+    this.initializeGrass();
+    this.mesh.instanceMatrix.needsUpdate = true;
   }
 
   getMesh(): THREE.Object3D {
