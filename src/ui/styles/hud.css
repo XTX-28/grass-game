@@ -1,0 +1,56 @@
+.hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%);
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.hud-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+.hud-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-progress {
+  width: 120px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.hud-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  border-radius: 4px;
+  transition: width 0.2s ease;
+}
+
+.hud.hidden {
+  display: none;
+}
